@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional Forex Pips Calculator with Risk Management - Calculate position sizes, stop loss, and take profit levels for major currency pairs and metals">
+    <meta name="keywords" content="forex, pips calculator, trading, risk management, position sizing, forex calculator, currency trading, XAU/USD, EUR/USD">
+    <meta name="author" content="STARFX">
+    <meta property="og:title" content="STARFX PIPS CALCULATOR - Professional Forex Trading Tool">
+    <meta property="og:description" content="Free professional forex pips calculator with position sizing, risk management, and multiple R:R ratios">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://starfx-pips.vercel.app">
+    <title>STARFX PIPS CALCULATOR - Professional Forex Trading Tool</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --bg-color: #ffffff;
+            --card-bg: #f8fafc;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --input-bg: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed, var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .theme-toggle {
+                position: relative;
+                margin-top: 15px;
+                display: inline-block;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .tooltip {
+            display: inline-block;
+            margin-left: 8px;
+            cursor: help;
+            color: var(--primary-color);
+            position: relative;
+            font-weight: bold;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            font-weight: normal;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .results {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            background: rgba(37, 99, 235, 0.05);
+            margin: 0 -15px;
+            padding-left: 15px;
+            padding-right: 15px;
+            border-radius: 8px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(16, 185, 129, 0.1));
+            border: 2px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .position-direction {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .direction-btn {
+            padding: 15px;
+            border: 3px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .direction-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .direction-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .calculate-btn {
+                padding: 15px;
+                font-size: 16px;
+            }
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .highlight-section {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 STARFX PIPS CALCULATOR</h1>
+            <p class="subtitle">Professional Forex Risk Management & Position Sizing Tool</p>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Accurate Calculations</div>
+                <div class="feature-desc">Precise pip values for all major forex pairs and metals</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Real-time Results</div>
+                <div class="feature-desc">Instant position sizing and risk calculations</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Mobile Friendly</div>
+                <div class="feature-desc">Works perfectly on all devices and screen sizes</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label for="currencyPair">
+                        Currency Pair / Metal
+                        <span class="tooltip" data-tooltip="Select the forex pair or precious metal you want to trade">ⓘ</span>
+                    </label>
+                    <select id="currencyPair" required>
+                        <option value="">Select a trading pair...</option>
+                        <option value="EURUSD">🇪🇺🇺🇸 EUR/USD - Euro vs US Dollar</option>
+                        <option value="GBPUSD">🇬🇧🇺🇸 GBP/USD - British Pound vs US Dollar</option>
+                        <option value="USDJPY">🇺🇸🇯🇵 USD/JPY - US Dollar vs Japanese Yen</option>
+                        <option value="USDCHF">🇺🇸🇨🇭 USD/CHF - US Dollar vs Swiss Franc</option>
+                        <option value="AUDUSD">🇦🇺🇺🇸 AUD/USD - Australian Dollar vs US Dollar</option>
+                        <option value="USDCAD">🇺🇸🇨🇦 USD/CAD - US Dollar vs Canadian Dollar</option>
+                        <option value="XAUUSD">💰 XAU/USD - Gold vs US Dollar</option>
+                        <option value="XAGUSD">🥈 XAG/USD - Silver vs US Dollar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Position Direction</label>
+                    <div class="position-direction">
+                        <div class="direction-btn active" onclick="setDirection('buy')" id="buyBtn">
+                            📈 BUY / LONG
+                        </div>
+                        <div class="direction-btn" onclick="setDirection('sell')" id="sellBtn">
+                            📉 SELL / SHORT
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="entryPrice">
+                            Entry Price
+                            <span class="tooltip" data-tooltip="The price at which you plan to enter the trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="entryPrice" step="0.00001" placeholder="e.g., 1.08500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pipsToRisk">
+                            Pips to Risk
+                            <span class="tooltip" data-tooltip="How many pips you're willing to risk on this trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="pipsToRisk" step="0.1" placeholder="e.g., 20" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="riskAmount">
+                            Amount to Risk (USD)
+                            <span class="tooltip" data-tooltip="The dollar amount you're willing to lose on this trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="riskAmount" step="0.01" placeholder="e.g., 100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountSize">
+                            Account Size (USD) - Optional
+                            <span class="tooltip" data-tooltip="Your total account balance for risk percentage calculation">ⓘ</span>
+                        </label>
+                        <input type="number" id="accountSize" step="0.01" placeholder="e.g., 10000">
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn" id="calculateBtn">
+                    🚀 Calculate Position
+                </button>
+            </form>
+        </div>
+
+        <div class="card results" id="results">
+            <div class="highlight-section">
+                <h3 style="margin-bottom: 25px; color: var(--primary-color); text-align: center;">📊 Trading Calculation Results</h3>
+                
+                <div class="result-item">
+                    <span class="result-label">🛑 Stop Loss Price:</span>
+                    <span class="result-value" id="stopLossPrice">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">📏 Position Size:</span>
+                    <span class="result-value" id="positionSize">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🔢 Position Size (Units):</span>
+                    <span class="result-value" id="positionUnits">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🎯 Take Profit 1:1 RR:</span>
+                    <span class="result-value" id="takeProfit1">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🎯 Take Profit 1:2 RR:</span>
+                    <span class="result-value" id="takeProfit2">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🎯 Take Profit 1:3 RR:</span>
+                    <span class="result-value" id="takeProfit3">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🎯 Take Profit 1:4 RR:</span>
+                    <span class="result-value" id="takeProfit4">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">🎯 Take Profit 1:5 RR:</span>
+                    <span class="result-value" id="takeProfit5">-</span>
+                </div>
+                
+                <div class="result-item" id="riskPercentageRow" style="display: none;">
+                    <span class="result-label">⚠️ Risk Percentage:</span>
+                    <span class="result-value" id="riskPercentage">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="infoBox" style="display: none;">
+            <div class="info-box">
+                <div class="info-title" id="infoTitle">📈 Pip Information</div>
+                <div class="info-text" id="infoText">Select a currency pair to see detailed pip information.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>STARFX PIPS CALCULATOR</strong> | 
+                Professional Forex Trading Tool | 
+                <a href="https://github.com/Bigshakur/STARFX-PIPS" target="_blank">Open Source</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 14px;">
+                ⚠️ <em>Trading involves significant risk. Use proper risk management.</em>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDirection = 'buy';
+        let currentTheme = localStorage.getItem('starfx-theme') || 'light';
+
+        // Pip value configurations for different pairs
+        const pairConfigs = {
+            'EURUSD': {
+                name: 'EUR/USD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'EUR/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 EUR), 1 pip = $10. Most liquid forex pair with tight spreads.'
+            },
+            'GBPUSD': {
+                name: 'GBP/USD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'GBP/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 GBP), 1 pip = $10. Known as "Cable" with good volatility.'
+            },
+            'USDJPY': {
+                name: 'USD/JPY',
+                pipValue: 10,
+                pipDecimals: 3,
+                info: 'USD/JPY is quoted to 3 decimal places. 1 pip = 0.01. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with JPY rate). Second most liquid pair.'
+            },
+            'USDCHF': {
+                name: 'USD/CHF',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'USD/CHF is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with CHF rate). Safe-haven currency pair.'
+            },
+            'AUDUSD': {
+                name: 'AUD/USD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'AUD/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 AUD), 1 pip = $10. Known as "Aussie", commodity-linked currency.'
+            },
+            'USDCAD': {
+                name: 'USD/CAD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'USD/CAD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with CAD rate). Known as "Loonie".'
+            },
+            'XAUUSD': {
+                name: 'XAU/USD (Gold)',
+                pipValue: 1,
+                pipDecimals: 2,
+                info: 'Gold is quoted to 2 decimal places. 1 pip = $0.01. Standard trading unit is 100 oz, so 1 pip = $1 for 100 oz. Popular safe-haven asset.'
+            },
+            'XAGUSD': {
+                name: 'XAG/USD (Silver)',
+                pipValue: 5,
+                pipDecimals: 3,
+                info: 'Silver is quoted to 3 decimal places. 1 pip = $0.001. Standard trading unit is 5000 oz, so 1 pip = $5 for 5000 oz. Industrial and precious metal.'
+            }
+        };
+
+        // Initialize app on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTheme(currentTheme);
+            document.getElementById('calculatorForm').addEventListener('submit', handleCalculation);
+            document.getElementById('currencyPair').addEventListener('change', updatePairInfo);
+            setDirection('buy');
+            
+            // Add loading animation
+            const calculateBtn = document.getElementById('calculateBtn');
+            calculateBtn.addEventListener('click', function() {
+                calculateBtn.innerHTML = '⏳ Calculating...';
+                calculateBtn.classList.add('loading');
+            });
+        });
+
+        // Theme management
+        function toggleTheme() {
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('starfx-theme', theme);
+            
+            const themeToggle = document.getElementById('themeToggle');
+            if (theme === 'dark') {
+                themeToggle.textContent = '☀️ Light Mode';
+            } else {
+                themeToggle.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // Position direction management
+        function setDirection(direction) {
+            currentDirection = direction;
+            
+            const buyBtn = document.getElementById('buyBtn');
+            const sellBtn = document.getElementById('sellBtn');
+            
+            if (direction === 'buy') {
+                buyBtn.classList.add('active');
+                sellBtn.classList.remove('active');
+            } else {
+                sellBtn.classList.add('active');
+                buyBtn.classList.remove('active');
+            }
+        }
+
+        // Pair information updates
+        function updatePairInfo() {
+            const pairSelect = document.getElementById('currencyPair');
+            const selectedPair = pairSelect.value;
+            const infoBox = document.getElementById('infoBox');
+            const infoTitle = document.getElementById('infoTitle');
+            const infoText = document.getElementById('infoText');
+            
+            if (selectedPair && pairConfigs[selectedPair]) {
+                const config = pairConfigs[selectedPair];
+                infoTitle.textContent = `📈 ${config.name} - Trading Information`;
+                infoText.textContent = config.info;
+                infoBox.style.display = 'block';
+            } else {
+                infoBox.style.display = 'none';
+            }
+        }
+
+        // Calculation functions
+        function calculatePipValue(pair, entryPrice) {
+            const config = pairConfigs[pair];
+            if (!config) return 10;
+            
+            if (pair.endsWith('USD') && !pair.startsWith('USD')) {
+                return 10;
+            }
+            
+            if (pair.startsWith('USD') && !pair.endsWith('USD')) {
+                const pipSize = pair === 'USDJPY' ? 0.01 : 0.0001;
+                return (pipSize / entryPrice) * 100000;
+            }
+            
+            if (pair === 'XAUUSD') return 1;
+            if (pair === 'XAGUSD') return 5;
+            
+            return 10;
+        }
+
+        function getPipSize(pair) {
+            if (pair === 'USDJPY') return 0.01;
+            if (pair === 'XAUUSD') return 0.01;
+            if (pair === 'XAGUSD') return 0.001;
+            return 0.0001;
+        }
+
+        function calculateStopLoss(entryPrice, pipsToRisk, direction, pair) {
+            const pipSize = getPipSize(pair);
+            const riskInPrice = pipsToRisk * pipSize;
+            
+            return direction === 'buy' ? 
+                entryPrice - riskInPrice : 
+                entryPrice + riskInPrice;
+        }
+
+        function calculateTakeProfit(entryPrice, pipsToRisk, direction, pair, ratio = 1) {
+            const pipSize = getPipSize(pair);
+            const profitInPrice = pipsToRisk * pipSize * ratio;
+            
+            return direction === 'buy' ? 
+                entryPrice + profitInPrice : 
+                entryPrice - profitInPrice;
+        }
+
+        function formatPrice(price, pair) {
+            const config = pairConfigs[pair];
+            return config ? price.toFixed(config.pipDecimals) : price.toFixed(5);
+        }
+
+        // Main calculation handler
+        function handleCalculation(event) {
+            event.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(el => el.remove());
+            
+            try {
+                // Get form values
+                const pair = document.getElementById('currencyPair').value;
+                const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+                const pipsToRisk = parseFloat(document.getElementById('pipsToRisk').value);
+                const riskAmount = parseFloat(document.getElementById('riskAmount').value);
+                const accountSize = parseFloat(document.getElementById('accountSize').value) || null;
+                
+                // Validation
+                if (!pair || !entryPrice || !pipsToRisk || !riskAmount) {
+                    throw new Error('⚠️ Please fill in all required fields');
+                }
+                
+                if (entryPrice <= 0 || pipsToRisk <= 0 || riskAmount <= 0) {
+                    throw new Error('⚠️ All values must be positive numbers');
+                }
+
+                if (pipsToRisk > 500) {
+                    throw new Error('⚠️ Risk exceeds 500 pips - please verify your input');
+                }
+
+                if (riskAmount > 50000) {
+                    throw new Error('⚠️ Risk amount exceeds $50,000 - please verify your input');
+                }
+                
+                // Perform calculations
+                const pipValue = calculatePipValue(pair, entryPrice);
+                const riskPerPip = riskAmount / pipsToRisk;
+                const positionSizeLots = riskPerPip / pipValue;
+                
+                let unitsMultiplier = 100000;
+                if (pair === 'XAUUSD') unitsMultiplier = 100;
+                if (pair === 'XAGUSD') unitsMultiplier = 5000;
+                
+                const positionSizeUnits = positionSizeLots * unitsMultiplier;
+                
+                // Calculate all prices
+                const stopLossPrice = calculateStopLoss(entryPrice, pipsToRisk, currentDirection, pair);
+                const takeProfit1 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 1);
+                const takeProfit2 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 2);
+                const takeProfit3 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 3);
+                const takeProfit4 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 4);
+                const takeProfit5 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 5);
+                
+                // Update results display
+                document.getElementById('stopLossPrice').textContent = formatPrice(stopLossPrice, pair);
+                document.getElementById('positionSize').textContent = positionSizeLots.toFixed(2) + ' lots';
+                document.getElementById('positionUnits').textContent = Math.round(positionSizeUnits).toLocaleString() + ' units';
+                document.getElementById('takeProfit1').textContent = formatPrice(takeProfit1, pair);
+                document.getElementById('takeProfit2').textContent = formatPrice(takeProfit2, pair);
+                document.getElementById('takeProfit3').textContent = formatPrice(takeProfit3, pair);
+                document.getElementById('takeProfit4').textContent = formatPrice(takeProfit4, pair);
+                document.getElementById('takeProfit5').textContent = formatPrice(takeProfit5, pair);
+                
+                // Show risk percentage if account size provided
+                const riskPercentageRow = document.getElementById('riskPercentageRow');
+                if (accountSize && accountSize > 0) {
+                    const riskPercentage = (riskAmount / accountSize) * 100;
+                    document.getElementById('riskPercentage').textContent = riskPercentage.toFixed(2) + '%';
+                    riskPercentageRow.style.display = 'flex';
+                    
+                    // Add risk warning for high percentages
+                    if (riskPercentage > 10) {
+                        document.getElementById('riskPercentage').style.color = 'var(--error-color)';
+                    } else if (riskPercentage > 5) {
+                        document.getElementById('riskPercentage').style.color = 'var(--warning-color)';
+                    } else {
+                        document.getElementById('riskPercentage').style.color = 'var(--success-color)';
+                    }
+                } else {
+                    riskPercentageRow.style.display = 'none';
+                }
+                
+                // Show results with animation
+                document.getElementById('results').classList.add('show');
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                // Reset button
+                setTimeout(() => {
+                    const calculateBtn = document.getElementById('calculateBtn');
+                    calculateBtn.innerHTML = '🚀 Calculate Position';
+                    calculateBtn.classList.remove('loading');
+                }, 500);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            
+            const form = document.getElementById('calculatorForm');
+            form.appendChild(errorDiv);
+            
+            // Remove error after 5 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
+
+        // Utility functions
+        function clearForm() {
+            document.getElementById('calculatorForm').reset();
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('infoBox').style.display = 'none';
+            setDirection('buy');
+            document.querySelectorAll('.error').forEach(el => el.remove());
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.altKey && event.key === 't') {
+                event.preventDefault();
+                toggleTheme();
+            }
+            
+            if (event.altKey && event.key === 'c') {
+                event.preventDefault();
+                clearForm();
+            }
+
+            if (event.key === 'Enter' && event.target.tagName !== 'BUTTON') {
+                event.preventDefault();
+                document.getElementById('calculateBtn').click();
+            }
+        });
+
+        // Service Worker for PWA capabilities
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {
+                // Service worker registration failed - non-critical
+            });
+        }
+    </script>
+</body>
+</html>

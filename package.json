@@ -1,0 +1,54 @@
+{
+  "name": "starfx-pips-calculator",
+  "version": "1.0.0",
+  "description": "Professional Forex Risk Management & Position Sizing Tool - Calculate position sizes, stop loss, and take profit levels for major currency pairs and metals",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve .",
+    "build": "echo 'Static site - no build needed'",
+    "start": "serve -s .",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "forex",
+    "pips calculator",
+    "trading",
+    "risk management",
+    "position sizing",
+    "forex calculator",
+    "currency trading",
+    "XAU/USD",
+    "EUR/USD",
+    "GBP/USD",
+    "gold trading",
+    "silver trading",
+    "stop loss calculator",
+    "take profit calculator",
+    "trading tools",
+    "financial calculator"
+  ],
+  "author": {
+    "name": "Bigshakur",
+    "url": "https://github.com/Bigshakur"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bigshakur/STARFX-PIPS.git"
+  },
+  "homepage": "https://starfx-pips.vercel.app",
+  "bugs": {
+    "url": "https://github.com/Bigshakur/STARFX-PIPS/issues"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "not op_mini all"
+  ]
+}
