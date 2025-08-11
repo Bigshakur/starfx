@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARFX PIPS CALCULATOR</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #ffffff;
+            --card-bg: #f8fafc;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --input-bg: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .theme-toggle {
+                position: relative;
+                margin-top: 10px;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .tooltip {
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .info-box {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .position-direction {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .direction-btn {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .direction-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .direction-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>STARFX PIPS CALCULATOR</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark</button>
+        </div>
+
+        <div class="card">
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label for="currencyPair">
+                        Currency Pair / Metal
+                        <span class="tooltip" data-tooltip="Select the forex pair or precious metal you want to trade">ⓘ</span>
+                    </label>
+                    <select id="currencyPair" required>
+                        <option value="">Select a pair...</option>
+                        <option value="EURUSD">EUR/USD</option>
+                        <option value="GBPUSD">GBP/USD</option>
+                        <option value="USDJPY">USD/JPY</option>
+                        <option value="USDCHF">USD/CHF</option>
+                        <option value="AUDUSD">AUD/USD</option>
+                        <option value="USDCAD">USD/CAD</option>
+                        <option value="XAUUSD">XAU/USD (Gold)</option>
+                        <option value="XAGUSD">XAG/USD (Silver)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Position Direction</label>
+                    <div class="position-direction">
+                        <div class="direction-btn active" onclick="setDirection('buy')" id="buyBtn">
+                            📈 BUY / LONG
+                        </div>
+                        <div class="direction-btn" onclick="setDirection('sell')" id="sellBtn">
+                            📉 SELL / SHORT
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="entryPrice">
+                            Entry Price
+                            <span class="tooltip" data-tooltip="The price at which you plan to enter the trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="entryPrice" step="0.00001" placeholder="1.08500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pipsToRisk">
+                            Pips to Risk
+                            <span class="tooltip" data-tooltip="How many pips you're willing to risk on this trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="pipsToRisk" step="0.1" placeholder="20" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="riskAmount">
+                            Amount to Risk (USD)
+                            <span class="tooltip" data-tooltip="The dollar amount you're willing to lose on this trade">ⓘ</span>
+                        </label>
+                        <input type="number" id="riskAmount" step="0.01" placeholder="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountSize">
+                            Account Size (USD) - Optional
+                            <span class="tooltip" data-tooltip="Your total account balance for risk percentage calculation">ⓘ</span>
+                        </label>
+                        <input type="number" id="accountSize" step="0.01" placeholder="10000">
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">Calculate Position</button>
+            </form>
+        </div>
+
+        <div class="card results" id="results">
+            <h3 style="margin-bottom: 20px; color: var(--primary-color);">📊 Calculation Results</h3>
+            
+            <div class="result-item">
+                <span class="result-label">Stop Loss Price:</span>
+                <span class="result-value" id="stopLossPrice">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Position Size:</span>
+                <span class="result-value" id="positionSize">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Position Size (Units):</span>
+                <span class="result-value" id="positionUnits">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Take Profit 1:1 RR:</span>
+                <span class="result-value" id="takeProfit1">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Take Profit 1:2 RR:</span>
+                <span class="result-value" id="takeProfit2">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Take Profit 1:3 RR:</span>
+                <span class="result-value" id="takeProfit3">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Take Profit 1:4 RR:</span>
+                <span class="result-value" id="takeProfit4">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Take Profit 1:5 RR:</span>
+                <span class="result-value" id="takeProfit5">-</span>
+            </div>
+            
+            <div class="result-item" id="riskPercentageRow" style="display: none;">
+                <span class="result-label">Risk Percentage:</span>
+                <span class="result-value" id="riskPercentage">-</span>
+            </div>
+        </div>
+
+        <div class="card" id="infoBox" style="display: none;">
+            <div class="info-box">
+                <div class="info-title" id="infoTitle">Pip Information</div>
+                <div class="info-text" id="infoText">Select a currency pair to see pip information.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDirection = 'buy';
+        let currentTheme = localStorage.getItem('theme') || 'light';
+
+        // Pip value configurations for different pairs
+        const pairConfigs = {
+            'EURUSD': {
+                name: 'EUR/USD',
+                pipValue: 10, // For 1 standard lot (100,000 units)
+                pipDecimals: 5,
+                info: 'EUR/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 EUR), 1 pip = $10.'
+            },
+            'GBPUSD': {
+                name: 'GBP/USD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'GBP/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 GBP), 1 pip = $10.'
+            },
+            'USDJPY': {
+                name: 'USD/JPY',
+                pipValue: 10, // Approximate, varies with JPY rate
+                pipDecimals: 3,
+                info: 'USD/JPY is quoted to 3 decimal places. 1 pip = 0.01. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with JPY rate).'
+            },
+            'USDCHF': {
+                name: 'USD/CHF',
+                pipValue: 10, // Approximate, varies with CHF rate
+                pipDecimals: 5,
+                info: 'USD/CHF is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with CHF rate).'
+            },
+            'AUDUSD': {
+                name: 'AUD/USD',
+                pipValue: 10,
+                pipDecimals: 5,
+                info: 'AUD/USD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 AUD), 1 pip = $10.'
+            },
+            'USDCAD': {
+                name: 'USD/CAD',
+                pipValue: 10, // Approximate, varies with CAD rate
+                pipDecimals: 5,
+                info: 'USD/CAD is quoted to 5 decimal places. 1 pip = 0.0001. For 1 standard lot (100,000 USD), 1 pip ≈ $10 (varies with CAD rate).'
+            },
+            'XAUUSD': {
+                name: 'XAU/USD (Gold)',
+                pipValue: 10, // For 1 oz
+                pipDecimals: 2,
+                info: 'Gold is quoted to 2 decimal places. 1 pip = $0.01. For 1 oz of gold, 1 pip = $0.01. Standard trading unit is 100 oz, so 1 pip = $1 for 100 oz.'
+            },
+            'XAGUSD': {
+                name: 'XAG/USD (Silver)',
+                pipValue: 50, // For 5000 oz (standard contract)
+                pipDecimals: 3,
+                info: 'Silver is quoted to 3 decimal places. 1 pip = $0.001. Standard trading unit is 5000 oz, so 1 pip = $5 for 5000 oz.'
+            }
+        };
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTheme(currentTheme);
+            
+            // Add event listeners
+            document.getElementById('calculatorForm').addEventListener('submit', handleCalculation);
+            document.getElementById('currencyPair').addEventListener('change', updatePairInfo);
+            
+            // Set initial direction
+            setDirection('buy');
+        });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const themeToggle = document.getElementById('themeToggle');
+            if (theme === 'dark') {
+                themeToggle.textContent = '☀️ Light';
+            } else {
+                themeToggle.textContent = '🌙 Dark';
+            }
+        }
+
+        // Position direction functionality
+        function setDirection(direction) {
+            currentDirection = direction;
+            
+            const buyBtn = document.getElementById('buyBtn');
+            const sellBtn = document.getElementById('sellBtn');
+            
+            if (direction === 'buy') {
+                buyBtn.classList.add('active');
+                sellBtn.classList.remove('active');
+            } else {
+                sellBtn.classList.add('active');
+                buyBtn.classList.remove('active');
+            }
+        }
+
+        // Update pair information
+        function updatePairInfo() {
+            const pairSelect = document.getElementById('currencyPair');
+            const selectedPair = pairSelect.value;
+            const infoBox = document.getElementById('infoBox');
+            const infoTitle = document.getElementById('infoTitle');
+            const infoText = document.getElementById('infoText');
+            
+            if (selectedPair && pairConfigs[selectedPair]) {
+                const config = pairConfigs[selectedPair];
+                infoTitle.textContent = `${config.name} - Pip Information`;
+                infoText.textContent = config.info;
+                infoBox.style.display = 'block';
+            } else {
+                infoBox.style.display = 'none';
+            }
+        }
+
+        // Calculate pip value based on pair
+        function calculatePipValue(pair, entryPrice) {
+            const config = pairConfigs[pair];
+            if (!config) return 10; // Default fallback
+            
+            // For USD pairs where USD is the quote currency (EUR/USD, GBP/USD, etc.)
+            if (pair.endsWith('USD') && !pair.startsWith('USD')) {
+                return 10; // $10 per pip for 1 standard lot
+            }
+            
+            // For USD pairs where USD is the base currency (USD/JPY, USD/CHF, etc.)
+            if (pair.startsWith('USD') && !pair.endsWith('USD')) {
+                // Pip value = (pip size / exchange rate) * lot size
+                const pipSize = pair === 'USDJPY' ? 0.01 : 0.0001;
+                return (pipSize / entryPrice) * 100000; // For 1 standard lot
+            }
+            
+            // For metals
+            if (pair === 'XAUUSD') {
+                return 1; // $1 per pip for 100 oz (standard gold contract)
+            }
+            
+            if (pair === 'XAGUSD') {
+                return 5; // $5 per pip for 5000 oz (standard silver contract)
+            }
+            
+            return 10; // Default fallback
+        }
+
+        // Get pip size for calculations
+        function getPipSize(pair) {
+            if (pair === 'USDJPY') return 0.01;
+            if (pair === 'XAUUSD') return 0.01;
+            if (pair === 'XAGUSD') return 0.001;
+            return 0.0001; // Default for most major pairs
+        }
+
+        // Calculate stop loss price
+        function calculateStopLoss(entryPrice, pipsToRisk, direction, pair) {
+            const pipSize = getPipSize(pair);
+            const riskInPrice = pipsToRisk * pipSize;
+            
+            if (direction === 'buy') {
+                return entryPrice - riskInPrice;
+            } else {
+                return entryPrice + riskInPrice;
+            }
+        }
+
+        // Calculate take profit prices
+        function calculateTakeProfit(entryPrice, pipsToRisk, direction, pair, ratio = 1) {
+            const pipSize = getPipSize(pair);
+            const profitInPrice = pipsToRisk * pipSize * ratio;
+            
+            if (direction === 'buy') {
+                return entryPrice + profitInPrice;
+            } else {
+                return entryPrice - profitInPrice;
+            }
+        }
+
+        // Format price based on pair
+        function formatPrice(price, pair) {
+            const config = pairConfigs[pair];
+            if (!config) return price.toFixed(5);
+            
+            return price.toFixed(config.pipDecimals);
+        }
+
+        // Main calculation function
+        function handleCalculation(event) {
+            event.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error').forEach(el => el.remove());
+            
+            try {
+                // Get form values
+                const pair = document.getElementById('currencyPair').value;
+                const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+                const pipsToRisk = parseFloat(document.getElementById('pipsToRisk').value);
+                const riskAmount = parseFloat(document.getElementById('riskAmount').value);
+                const accountSize = parseFloat(document.getElementById('accountSize').value) || null;
+                
+                // Validate inputs
+                if (!pair || !entryPrice || !pipsToRisk || !riskAmount) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                if (entryPrice <= 0 || pipsToRisk <= 0 || riskAmount <= 0) {
+                    throw new Error('All values must be positive numbers');
+                }
+                
+                // Calculate pip value for this pair and entry price
+                const pipValue = calculatePipValue(pair, entryPrice);
+                
+                // Calculate position size in lots
+                const riskPerPip = riskAmount / pipsToRisk;
+                const positionSizeLots = riskPerPip / pipValue;
+                
+                // Calculate position size in units (1 standard lot = 100,000 units for forex)
+                let unitsMultiplier = 100000; // Default for forex
+                if (pair === 'XAUUSD') unitsMultiplier = 100; // 100 oz for gold
+                if (pair === 'XAGUSD') unitsMultiplier = 5000; // 5000 oz for silver
+                
+                const positionSizeUnits = positionSizeLots * unitsMultiplier;
+                
+                // Calculate prices
+                const stopLossPrice = calculateStopLoss(entryPrice, pipsToRisk, currentDirection, pair);
+                const takeProfit1 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 1);
+                const takeProfit2 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 2);
+                const takeProfit3 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 3);
+                const takeProfit4 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 4);
+                const takeProfit5 = calculateTakeProfit(entryPrice, pipsToRisk, currentDirection, pair, 5);
+                
+                // Update results display
+                document.getElementById('stopLossPrice').textContent = formatPrice(stopLossPrice, pair);
+                document.getElementById('positionSize').textContent = positionSizeLots.toFixed(2) + ' lots';
+                document.getElementById('positionUnits').textContent = positionSizeUnits.toLocaleString() + ' units';
+                document.getElementById('takeProfit1').textContent = formatPrice(takeProfit1, pair);
+                document.getElementById('takeProfit2').textContent = formatPrice(takeProfit2, pair);
+                document.getElementById('takeProfit3').textContent = formatPrice(takeProfit3, pair);
+                document.getElementById('takeProfit4').textContent = formatPrice(takeProfit4, pair);
+                document.getElementById('takeProfit5').textContent = formatPrice(takeProfit5, pair);
+                
+                // Show/hide risk percentage if account size is provided
+                const riskPercentageRow = document.getElementById('riskPercentageRow');
+                if (accountSize && accountSize > 0) {
+                    const riskPercentage = (riskAmount / accountSize) * 100;
+                    document.getElementById('riskPercentage').textContent = riskPercentage.toFixed(2) + '%';
+                    riskPercentageRow.style.display = 'flex';
+                } else {
+                    riskPercentageRow.style.display = 'none';
+                }
+                
+                // Show results
+                document.getElementById('results').classList.add('show');
+                
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                // Display error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = error.message;
+                
+                const form = document.getElementById('calculatorForm');
+                form.appendChild(errorDiv);
+            }
+        }
+
+        // Add some helper functions for better user experience
+        function clearForm() {
+            document.getElementById('calculatorForm').reset();
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('infoBox').style.display = 'none';
+            setDirection('buy');
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Alt + T to toggle theme
+            if (event.altKey && event.key === 't') {
+                event.preventDefault();
+                toggleTheme();
+            }
+            
+            // Alt + C to clear form
+            if (event.altKey && event.key === 'c') {
+                event.preventDefault();
+                clearForm();
+            }
+        });
+
+    </script>
+</body>
+</html>
